@@ -1,0 +1,6 @@
+﻿  Source.cpp
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(231,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(294,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(304,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(522,6): warning C4102: 'skip': unreferenced label
+  spaceInvaders.vcxproj -> C:\Users\himch\Desktop\New folder (4)\Debug\spaceInvaders.exe

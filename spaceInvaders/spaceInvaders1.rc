@@ -1,0 +1,125 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource1.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource1.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
+    LTEXT           "Player Speed",IDC_STATIC,53,26,43,8
+    PUSHBUTTON      "+",IDC_BUTTON1,79,41,21,14
+    PUSHBUTTON      "-",IDC_BUTTON2,50,41,20,14
+    LTEXT           "Enemy Speed",IDC_STATIC,49,81,44,8
+    PUSHBUTTON      "+",IDC_BUTTON3,75,97,21,14
+    PUSHBUTTON      "-",IDC_BUTTON4,45,97,20,14
+    LTEXT           "Gravity",IDC_STATIC,57,122,24,8
+    PUSHBUTTON      "+",IDC_BUTTON5,73,135,21,14
+    PUSHBUTTON      "-",IDC_BUTTON6,43,135,20,14
+    EDITTEXT        IDC_EDIT2,169,42,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT3,169,60,40,14,ES_AUTOHSCROLL
+    LTEXT           "x : ",IDC_STATIC,153,45,12,8
+    LTEXT           "y : ",IDC_STATIC,153,62,12,8
+    LTEXT           "Transform player",IDC_STATIC,161,29,56,8
+    PUSHBUTTON      "Transform",IDC_BUTTON7,211,78,50,14
+    PUSHBUTTON      "Save Current",IDC_BUTTON8,167,111,50,14
+    PUSHBUTTON      "Load Content",IDC_BUTTON9,233,111,50,14
+    PUSHBUTTON      "GOD",IDC_CHECK1,45,59,21,14
+    EDITTEXT        IDC_EDIT1,73,58,36,14,ES_AUTOHSCROLL | WS_DISABLED
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG1 AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

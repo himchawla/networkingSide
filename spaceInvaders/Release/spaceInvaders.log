@@ -1,0 +1,11 @@
+﻿  Source.cpp
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(231,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(294,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(304,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Desktop\New folder (4)\spaceInvaders\Source.cpp(522,6): warning C4102: 'skip': unreferenced label
+  Generating code
+  1 of 989 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    68 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  spaceInvaders.vcxproj -> C:\Users\himch\Desktop\New folder (4)\Release\spaceInvaders.exe
