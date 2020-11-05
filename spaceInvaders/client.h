@@ -22,6 +22,8 @@
 #include "networkentity.h"
 #include "WorkQueue.h"
 
+
+
 // Types
 
 // Constants
@@ -36,6 +38,17 @@ public:
 	// Default Constructors/Destructors
 	CClient();
 	~CClient();
+
+	bool flag = false;
+
+	std::string msg;
+
+	bool initFlag = false;
+
+	std::string initMsg;
+
+
+
 
 	// Methods
 

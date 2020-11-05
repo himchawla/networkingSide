@@ -25,9 +25,9 @@
 #include "network.h"
 #include "networkentity.h"
 #include "socket.h"
-
 //This includes
 #include "client.h"
+
 
 
 CClient::CClient()
@@ -371,6 +371,16 @@ void CClient::ProcessData(char* _pcDataReceived)
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 		std::cout << "SERVER> " << _packetRecvd.MessageContent << std::endl;
 		break;
+	}
+
+	case BROADCAST:
+	{
+		std::string msg = _packetRecvd.MessageContent;
+		int i = 0, j = 0;
+		std::string temp = "";
+		
+		initFlag = true;
+		initMsg = _packetRecvd.MessageContent;
 	}
 	default:
 		break;

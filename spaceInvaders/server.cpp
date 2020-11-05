@@ -76,26 +76,47 @@ bool CServer::AddClient(std::string _strClientName)
 {
 	//TO DO : Add the code to add a client to the map here...
 
-	for (auto it = m_pConnectedClients->begin(); it != m_pConnectedClients->end(); ++it)
+	if (!_4Done)
 	{
-		//Check to see that the client to be added does not already exist in the map, 
-		if (it->first == ToString(m_ClientAddress))
+		for (auto it = m_pConnectedClients->begin(); it != m_pConnectedClients->end(); ++it)
 		{
-			return false;
+			//Check to see that the client to be added does not already exist in the map, 
+			if (it->first == ToString(m_ClientAddress))
+			{
+				return false;
+			}
+			//also check for the existence of the username
+			else if (it->second.m_strName == _strClientName)
+			{
+				return false;
+			}
 		}
-		//also check for the existence of the username
-		else if (it->second.m_strName == _strClientName)
-		{
-			return false;
-		}
-	}
-	//Add the client to the map.
-	TClientDetails _clientToAdd;
-	_clientToAdd.m_strName = _strClientName;
-	_clientToAdd.m_ClientAddress = this->m_ClientAddress;
+		//Add the client to the map.
+		TClientDetails _clientToAdd;
+		_clientToAdd.m_strName = _strClientName;
+		_clientToAdd.m_ClientAddress = this->m_ClientAddress;
 
-	std::string _strAddress = ToString(m_ClientAddress);
-	m_pConnectedClients->insert(std::pair < std::string, TClientDetails >(_strAddress, _clientToAdd));
+		std::string _strAddress = ToString(m_ClientAddress);
+		m_pConnectedClients->insert(std::pair < std::string, TClientDetails >(_strAddress, _clientToAdd));
+	}
+	if (m_pConnectedClients->size() == 2)
+	{
+		_2Done = true;
+		sendInit();
+	}
+
+	if (m_pConnectedClients->size() == 3)
+	{
+		_3Done = true;
+		sendInit();
+	}
+
+	if (m_pConnectedClients->size() == 4)
+	{
+		_4Done = true;
+		sendInit();
+	}
+
 	return true;
 }
 
@@ -194,6 +215,33 @@ void CServer::GetRemoteIPAddress(char* _pcSendersIP)
 	strcpy_s(_pcSendersIP, _iAddressLength, _temp);
 }
 
+void CServer::sendInit()
+{
+	std::string msg = "";
+
+	msg += m_pConnectedClients->size();
+
+	for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
+	{
+		msg += "#";
+		msg += i->first;
+	
+	}
+
+	
+	msg += '\0';
+
+
+
+	TPacket _packetToSend;
+	_packetToSend.Serialize(BROADCAST, &msg[0]);
+
+	for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
+	{
+		SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
+	}
+}
+
 unsigned short CServer::GetRemotePort()
 {
 	return ntohs(m_ClientAddress.sin_port);
@@ -208,13 +256,16 @@ void CServer::ProcessData(std::pair<sockaddr_in, std::string> dataItem)
 	{
 	case HANDSHAKE:
 	{
-		std::string message = "Users in chatroom : ";
-		std::cout << "Server received a handshake message " << std::endl;
-		if (AddClient(_packetRecvd.MessageContent))
+		if (!hajime)
 		{
-			//Qs 3: To DO : Add the code to do a handshake here
-			_packetToSend.Serialize(HANDSHAKE_SUCCESS, const_cast<char*>(message.c_str()));
-			SendDataTo(_packetToSend.PacketData, dataItem.first);
+			std::string message = "Users in chatroom : ";
+			std::cout << "Server received a handshake message " << std::endl;
+			if (AddClient(_packetRecvd.MessageContent))
+			{
+				//Qs 3: To DO : Add the code to do a handshake here
+				_packetToSend.Serialize(HANDSHAKE_SUCCESS, const_cast<char*>(message.c_str()));
+				SendDataTo(_packetToSend.PacketData, dataItem.first);
+			}
 		}
 		break;
 	}
@@ -232,7 +283,7 @@ void CServer::ProcessData(std::pair<sockaddr_in, std::string> dataItem)
 				SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
 			}
 		}
-		SendData(_packetToSend.PacketData);
+	//	SendData(_packetToSend.PacketData);
 
 		break;
 	}

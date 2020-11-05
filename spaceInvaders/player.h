@@ -37,6 +37,8 @@ private:
 
 public:
 	int getLives();
+
+	void setLives(int l);
 	int getScore();
 	void addScore();
 	bool isJump();
