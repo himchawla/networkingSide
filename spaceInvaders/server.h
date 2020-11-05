@@ -46,6 +46,11 @@ public:
 	// Default Constructors/Destructors
 	CServer();
 	~CServer();
+	bool hajime = false;
+
+	bool _2Done = false;
+	bool _3Done = false;
+	bool _4Done = false;
 
 	// Virtual Methods from the Network Entity Interface.
 	virtual bool Initialise(); //Implicit in the intialization is the creation and binding of the socket
@@ -54,6 +59,7 @@ public:
 	virtual void ReceiveData(char* _pcBufferToReceiveData);
 	virtual void ProcessData(std::pair<sockaddr_in, std::string> dataItem);
 	virtual void GetRemoteIPAddress(char* _pcSendersIP);
+	void sendInit();
 	virtual unsigned short GetRemotePort();
 
 	CWorkQueue<std::pair<sockaddr_in, std::string>>* GetWorkQueue();

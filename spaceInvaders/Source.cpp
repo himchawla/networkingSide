@@ -35,6 +35,10 @@ float plaSpeed = 0.0f, enSpeed = 0.0f, gravVal = 0.0f;
 float pX = 0, pY = 0;
 bool wannaSend = true;
 
+std::map<std::string, player*> coOpAray;
+player* additional;
+
+
 
 
 INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)     // Dialog Box
@@ -200,6 +204,7 @@ struct packet
 	sf::Vector2f speed;
 	bool grounded;
 	std::string uName;
+	bool shoot;
 
 	packet(sf::Vector2f p, float l, float s, sf::Vector2f vel, float groun, std::string u)
 	{
@@ -221,7 +226,7 @@ bool hasChanged(player p, packet state)
 	if (p.dx != state.speed.x || p.dy != state.speed.y)
 		return true;
 	else return false;
-}
+}	   //Need to update
 
 void setStufff(player p, packet& state)
 {
@@ -229,6 +234,20 @@ void setStufff(player p, packet& state)
 	state.pos = sf::Vector2f(p.x, p.y);
 	state.grounded = p.grounded;
 	state.lives = p.getLives();
+
+}
+
+void stuffSet(player* p, packet& state)
+{
+
+	p->dx = state.speed.x;
+	p->dy = state.speed.y;
+	
+	p->x = state.pos.x;
+	p->y = state.pos.y;
+
+	p->grounded = state.grounded;
+	p->setLives(state.lives);
 
 }
 
@@ -432,6 +451,27 @@ int main()
 				std::pair<sockaddr_in, std::string> dataItem;
 				_pServer->GetWorkQueue()->pop(dataItem);
 				_pServer->ProcessData(dataItem);
+				if (_pServer->_2Done && !hajime)
+				{
+					std::cout << "\n Two client connected press \"F\" to proceed";
+					char ch = _getch();
+					if (ch == 'F' || ch == 'f')
+					{
+						_pServer->hajime = true;
+					}
+				}
+
+				if (_pServer->_3Done && !hajime)
+				{
+					std::cout << "\n Three client connected press \"F\" to proceed";
+					char ch = _getch();
+					if (ch == 'F' || ch == 'f')
+					{
+						hajime = true;
+					}
+				}
+
+
 			}
 		}
 	}
@@ -1303,8 +1343,61 @@ int main()
 				
 			}
 
+
+			//Scuffed Client calling stuff using bools
+			if (_pClient != nullptr)
+			{
+				if (_pClient->initFlag)
+				{
+					std::string msg = _pClient->initMsg;
+					std::string temp = "";
+
+					for (int i = 0; msg[i] != '\0'; i++)
+					{
+						if (msg[i] == '#')
+						{
+							additional = new player(100.0f, 200.0f);
+							std::pair<std::string, player*> t(temp, additional);
+							additional->setTexture("Assets/Warrior.png");
+							coOpAray.insert(t);
+							temp = "";
+						}
+
+						else
+						{
+							temp += msg[i];
+						}
+					}
+					_pClient->initFlag = false;
+				}
+
+				if (_pClient->flag)
+				{
+					std::string msg = _pClient->msg;
+
+					packet pInfo = recieved(msg);
+
+					for (auto i : coOpAray)
+					{
+						if (i.first == pInfo.uName)
+						{
+							stuffSet(i.second, pInfo);
+							if((pInfo.shoot))
+								i.second->attkey = 'X'; 
+						}
+					}
+				}
+			}
+
+			for (auto i : coOpAray)
+			{
+				i.second->update(deltaTime);
+			}
+
 			window.display();
 
+
+			
 		}
 
 		_ClientReceiveThread.join();

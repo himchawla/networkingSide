@@ -1,6 +1,10 @@
 ﻿  Source.cpp
-H:\networkingGame\spaceInvaders\Source.cpp(231,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-H:\networkingGame\spaceInvaders\Source.cpp(296,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-H:\networkingGame\spaceInvaders\Source.cpp(306,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-H:\networkingGame\spaceInvaders\Source.cpp(524,6): warning C4102: 'skip': unreferenced label
-  spaceInvaders.vcxproj -> H:\networkingGame\Debug\spaceInvaders.exe
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(237,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(251,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(316,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(326,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  network.cpp
+  server.cpp
+  Generating Code...
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(544,6): warning C4102: 'skip': unreferenced label
+  spaceInvaders.vcxproj -> D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\Debug\spaceInvaders.exe

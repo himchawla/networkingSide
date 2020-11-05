@@ -26,6 +26,11 @@ void player::addScore()
 	score++;
 }
 
+void player::setLives(int l)
+{
+	lives = l;
+}
+
 int player::getScore()
 {
 	return score;
