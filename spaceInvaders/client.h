@@ -48,7 +48,7 @@ public:
 	std::string initMsg;
 
 
-
+	bool hajime = false;
 
 	// Methods
 

@@ -451,23 +451,27 @@ int main()
 				std::pair<sockaddr_in, std::string> dataItem;
 				_pServer->GetWorkQueue()->pop(dataItem);
 				_pServer->ProcessData(dataItem);
-				if (_pServer->_2Done && !hajime)
+				if (_pServer->_2Done && !_pServer->hajime)
 				{
 					std::cout << "\n Two client connected press \"F\" to proceed";
-					char ch = _getch();
-					if (ch == 'F' || ch == 'f')
+					char ch;
+					std::cin >> ch;
+					if (ch == 'f')
 					{
 						_pServer->hajime = true;
+						_pServer->sendInit();
+
 					}
 				}
 
-				if (_pServer->_3Done && !hajime)
+				if (_pServer->_3Done && !_pServer->hajime)
 				{
 					std::cout << "\n Three client connected press \"F\" to proceed";
 					char ch = _getch();
 					if (ch == 'F' || ch == 'f')
 					{
-						hajime = true;
+						_pServer->hajime = true;
+						_pServer->sendInit();
 					}
 				}
 
@@ -605,7 +609,7 @@ int main()
 
 
 
-		while (window.isOpen() && _rNetwork.IsOnline())
+		while (window.isOpen() && _rNetwork.IsOnline() && _pClient->hajime)
 		{
 
 			_pClient = static_cast<CClient*>(_rNetwork.GetInstance().GetNetworkEntity());
@@ -1351,7 +1355,8 @@ int main()
 				{
 					std::string msg = _pClient->initMsg;
 					std::string temp = "";
-
+					int num = msg[0];
+					msg = &msg[2];
 					for (int i = 0; msg[i] != '\0'; i++)
 					{
 						if (msg[i] == '#')

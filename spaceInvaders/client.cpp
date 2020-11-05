@@ -378,7 +378,7 @@ void CClient::ProcessData(char* _pcDataReceived)
 		std::string msg = _packetRecvd.MessageContent;
 		int i = 0, j = 0;
 		std::string temp = "";
-		
+		hajime = true;
 		initFlag = true;
 		initMsg = _packetRecvd.MessageContent;
 	}
