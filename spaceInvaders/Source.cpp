@@ -247,7 +247,9 @@ std::string toSend(packet p)
 
 	temp.append(std::to_string(p.pos.y));
 
-	temp += "#" + std::to_string(p.lives) + "#" + std::to_string(p.score) + "#" + std::to_string(p.speed.x) + "#" + std::to_string(p.speed.y) + "#" + std::to_string(p.grounded);
+	temp += "#" + std::to_string((int)p.lives) + "#" + std::to_string((int)p.score) + "#" + std::to_string(p.speed.x) + "#" + std::to_string(p.speed.y) + "#" + std::to_string((int)p.grounded);
+
+	temp += '\0';
 
 	return temp;
 }
@@ -1287,20 +1289,20 @@ int main()
 
 			if (hasChanged(p1, currState))
 			{
-				std::cout << "Yess" << std::endl;
+
+				setStufff(p1, currState);
+				//	//Put the message into a packet structure
+				TPacket _packet;
+				std::string msg = toSend(currState);
+				_packet.Serialize(DATA, &msg[0]);
+				_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
+
 			}
 			else
 			{
-				std::cout << "Noooooooo" << std::endl;
+				
 			}
 
-			setStufff(p1, currState);
-			//	//Put the message into a packet structure
-			TPacket _packet;
-			std::string msg = toSend(currState);
-
-			_packet.Serialize(DATA, &msg[0]);
-			_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
 			window.display();
 
 		}
