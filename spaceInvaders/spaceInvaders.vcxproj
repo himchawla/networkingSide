@@ -72,18 +72,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)SFML-2.5.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjecyDir)SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)SFML-2.5.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)SFML-2.5.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjecyDir)SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -94,7 +94,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\himch\source\repos\spaceInvaders\spaceInvaders\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>$(ProjecyDir)SFML-2.5.1\bin;$(LibraryPath)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
