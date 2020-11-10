@@ -1054,6 +1054,14 @@ int main()
 						jedi = true;
 						show = true;
 						mover.sp.setColor(sf::Color::Green);
+
+						TPacket _packetToSend;
+						std::string data = _pClient->name + "#1#";
+						data += "lol0";
+
+						_packetToSend.Serialize(LEVELDAT, &data[0]);
+						_pClient->SendData(_packetToSend.PacketData);
+
 					}
 					else
 					{
@@ -1421,6 +1429,10 @@ int main()
 
 					switch (std::stoi(temp))
 					{
+					case 1:
+					{
+						show = true;
+					}break;
 					case 2:
 					{
 						level2.plats[1].setLocation(level2.plats[1].sp.getPosition().x, std::stof(_pClient->lvlDatMsg));
