@@ -1,1 +1,11 @@
-﻿  spaceInvaders.vcxproj -> D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSid\Debug\spaceInvaders.exe
+﻿  Source.cpp
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(245,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(246,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(263,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(265,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(330,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(340,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(1493,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(1517,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\himch\Documents\networkingSide\spaceInvaders\Source.cpp(557,6): warning C4102: 'skip': unreferenced label
+  spaceInvaders.vcxproj -> C:\Users\himch\Documents\networkingSide\Debug\spaceInvaders.exe

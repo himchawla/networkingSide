@@ -26,6 +26,11 @@ void player::addScore()
 	score++;
 }
 
+void player::setScore(int s)
+{
+	score = s;
+}
+
 void player::setLives(int l)
 {
 	lives = l;
@@ -171,6 +176,56 @@ void player::Keyboard()
 
 }
 
+
+
+
+
+void player::Key()
+{
+	if (dx < 0)
+	{
+		if (sp.getScale().x == -1)
+		{
+			sp.setScale(1, 1);
+			x -= 32;
+		}
+
+
+	}
+
+
+
+	if (dx > 0)
+	{
+		if (sp.getScale().x == 1)
+		{
+			sp.setScale(-1, 1);
+			x += 32;
+		}
+	}
+	
+	if (attkey == 'X')
+	{
+		if (b1 != nullptr)
+			if (!b1->alive)
+				b1 = new Bullet(x, y, 700.0f, ((dir) ? 1 : -1));
+			else
+				std::cout << "";
+		else
+			b1 = new Bullet(x, y, 900.0f, ((dir) ? 1 : -1));
+
+
+	}
+
+
+	key = '0';
+	if (verkey == 'V')
+		verkey = '0';
+	attkey = '0';
+
+
+}
+
 void player::setSpawnPos(float x, float y)
 {
 	spawnPos.x = x;
@@ -186,7 +241,8 @@ void player::update(float time)
 {
 	Keyboard();
 	
-	
+	if (dx > 0)
+		std::cout << "";
 
 	if (verkey == 'V' && isJumping)
 	{
@@ -220,6 +276,30 @@ void player::update(float time)
 
 }
 
+void player::ups(float time)
+{
+	Key();
+
+	if (dx > 0)
+	{
+		std::cout << "";
+	}
+
+	
+
+	verkey = '0';
+	//if (!grounded)
+		//dy += grav * time;
+	x += dx * time;
+
+	
+
+
+
+	y += dy * time;
+	//dy = 0;
+	setLocation(x, y);
+}
 
 player::player(float nx, float ny) :sprite(nx, ny)
 {

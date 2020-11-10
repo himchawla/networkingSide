@@ -193,7 +193,7 @@ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 // level Manager
 enum levell
 {
-	startScreen,lev1,lev2,lev3,gameOver,win
+	startScreen,lev1,lev2,lev3,gameOver,win, spectate
 }lev;
 
 struct packet
@@ -223,9 +223,18 @@ struct packet
 
 bool hasChanged(player p, packet state)
 {
-	if (p.dx != state.speed.x || p.dy != state.speed.y)
+	if (p.dx != state.speed.x)
 		return true;
-	else return false;
+
+	if (p.y != state.pos.y)
+		return true;
+
+	if (p.getScore() != state.score)
+		return true;
+
+	if(p.getLives()!=state.lives)
+		return true;
+	return false;
 }	   //Need to update
 
 void setStufff(player p, packet& state)
@@ -234,6 +243,9 @@ void setStufff(player p, packet& state)
 	state.pos = sf::Vector2f(p.x, p.y);
 	state.grounded = p.grounded;
 	state.lives = p.getLives();
+	state.score = p.getScore();
+	state.uName = p.Name;
+//	p.setLocation(p.x, p.y);
 
 }
 
@@ -246,6 +258,9 @@ void stuffSet(player* p, packet& state)
 	p->x = state.pos.x;
 	p->y = state.pos.y;
 
+//	p->setLocation(p->x, p->y);
+
+	p->setScore(state.score);
 	p->grounded = state.grounded;
 	p->setLives(state.lives);
 
@@ -367,7 +382,7 @@ int main()
 
 	std::string test = toSend(p);
 
-	packet p1 = recieved(test);
+	packet pack = recieved(test);
 
 	char* _pcPacketData = 0; //A local buffer to receive packet data info
 	_pcPacketData = new char[MAX_MESSAGE_LENGTH];
@@ -451,31 +466,7 @@ int main()
 				std::pair<sockaddr_in, std::string> dataItem;
 				_pServer->GetWorkQueue()->pop(dataItem);
 				_pServer->ProcessData(dataItem);
-				if (_pServer->_2Done && !_pServer->hajime)
-				{
-					std::cout << "\n Two client connected press \"F\" to proceed";
-					char ch;
-					std::cin >> ch;
-					if (ch == 'f')
-					{
-						_pServer->hajime = true;
-						_pServer->sendInit();
-
-					}
-				}
-
-				if (_pServer->_3Done && !_pServer->hajime)
-				{
-					std::cout << "\n Three client connected press \"F\" to proceed";
-					char ch = _getch();
-					if (ch == 'F' || ch == 'f')
-					{
-						_pServer->hajime = true;
-						_pServer->sendInit();
-					}
-				}
-
-
+				
 			}
 		}
 	}
@@ -492,8 +483,6 @@ int main()
 		HWND hDlg = CreateDialogParam(NULL, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc, 0);
 		std::ifstream file;
 		file.open("Assets/level.txt");
-		int lvl;
-		lvl = 0;
 		lev = startScreen;
 
 		//Texts and messages
@@ -510,6 +499,11 @@ int main()
 		lives.setPosition(1850, 10);
 		score.setPosition(1850, 110);
 
+		sf::Text dataLives;
+		sf::Text dataScore;
+
+		dataLives.setFont(font);
+		dataScore.setFont(font);
 
 
 		bool show = false;
@@ -567,71 +561,16 @@ int main()
 
 	skip:
 
-		/*switch (lvl)
-		{
-		case 1:
-		{
-			lev = lev1;
-			p1.setSpawnPos(level1.spawnPoints.x, level1.spawnPoints.y);
+		/*
 
-		}break;
-		case 2:
-		{
-			level1.checks[0].draw(window);
-
-			lev = lev1;
-			p1.setSpawnPos(level1.checks[0].x, level1.checks[0].y);
-			p1.setLocation(level1.checks[0].x, level1.checks[0].y + 10);
-		}break;
-		case 3:
-		{
-			lev = lev2;
-			p1.setSpawnPos(level2.spawnPoints.x, level2.spawnPoints.y);
-			p1.setLocation(level2.spawnPoints.x, level2.spawnPoints.y + 10);
-
-		}break;
-		case 4:
-		{
-			lev = lev2;
-			p1.setSpawnPos(level2.checks[0].x, level2.checks[0].x);
-		}break;
-		default:
-		{
-			lev = lev1;
-		}
-			break;
-		}
-
-		file >> lvl;
+		file >> _pClient->lvl;
 		*/
 		//Game Loop		t = sfClock();
 
-
-
-
-		while (window.isOpen() && _rNetwork.IsOnline() && _pClient->hajime)
+		while (_rNetwork.IsOnline())
 		{
+			_pClient = static_cast<CClient*>(_rNetwork.GetInstance().GetNetworkEntity()); _pClient = static_cast<CClient*>(_rNetwork.GetInstance().GetNetworkEntity());
 
-			_pClient = static_cast<CClient*>(_rNetwork.GetInstance().GetNetworkEntity());
-
-			//Prepare for reading input from the user
-			//_InputBuffer.PrintToScreenTop();
-
-			////Get input from the user
-			//if (_InputBuffer.Update())
-			//{
-			//	// we completed a message, lets send it:
-			//	int _iMessageSize = static_cast<int>(strlen(_InputBuffer.GetString()));
-
-			//	//Put the message into a packet structure
-			//	TPacket _packet;
-			//	_packet.Serialize(DATA, const_cast<char*>(_InputBuffer.GetString()));
-			//	_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
-			//	//Clear the Input Buffer
-			//	_InputBuffer.ClearString();
-			//	//Print To Screen Top
-			//	_InputBuffer.PrintToScreenTop();
-			//}
 			if (_pClient != nullptr)
 			{
 				//If the message queue is empty 
@@ -648,68 +587,196 @@ int main()
 				}
 			}
 
-
-
-
-
-
-			//Set View
-			window.setView(view1);
-
-			sf::Event event;
-			while (window.pollEvent(event))
+			while (window.isOpen() && _pClient->hajime)
 			{
-				window.setKeyRepeatEnabled(false);
 
-				if (event.type == sf::Event::Closed)
-					window.close();
-				if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Space))
+				if (_pClient != nullptr)
 				{
-					p1.verkey = 'V';
+					//If the message queue is empty 
+					if (_pClient->GetWorkQueue()->empty())
+					{
+						//Don't do anything
+					}
+					else
+					{
+						//Retrieve off a message from the queue and process it
+						std::string temp;
+						_pClient->GetWorkQueue()->pop(temp);
+						_pClient->ProcessData(const_cast<char*>(temp.c_str()));
+					}
 				}
-			}
-			//Debug Transform
-			if (toTransform)
-			{
-				p1.setLocation(pX, pY);
-				view1.setCenter(pX, view1.getCenter().y);
-				lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-				score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
 
 
-				toTransform = false;
-			}
+				//Prepare for reading input from the user
+				//_InputBuffer.PrintToScreenTop();
 
-			//StartScreen
-			while (lev == startScreen)
-			{
-				window.clear();
+				////Get input from the user
+				//if (_InputBuffer.Update())
+				//{
+				//	// we completed a message, lets send it:
+				//	int _iMessageSize = static_cast<int>(strlen(_InputBuffer.GetString()));
+
+				//	//Put the message into a packet structure
+				//	TPacket _packet;
+				//	_packet.Serialize(DATA, const_cast<char*>(_InputBuffer.GetString()));
+				//	_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
+				//	//Clear the Input Buffer
+				//	_InputBuffer.ClearString();
+				//	//Print To Screen Top
+				//	_InputBuffer.PrintToScreenTop();
+				//}
+
+
+
+
+
+
+				//Set View
+				window.setView(view1);
+
+				sf::Event event;
 				while (window.pollEvent(event))
 				{
+					window.setKeyRepeatEnabled(false);
 
 					if (event.type == sf::Event::Closed)
 						window.close();
+					if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Space))
+					{
+						p1.verkey = 'V';
+					}
 				}
-				//Intro
-				sf::Text Intro;
-				Intro.setFont(font);
-				Intro.setPosition(800, 400);
-				Intro.setString("Welcome to Coool Game\n Press 'Enter' to start a new game\n Press 'Q' to continue from your last adventure");
-				window.draw(Intro);
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+				//Debug Transform
+				if (toTransform)
 				{
-					//start level 1
-					lvl = 1;
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-				{
-					//Get level from file
-					file >> lvl;
-					file.close();
+					p1.setLocation(pX, pY);
+					view1.setCenter(pX, view1.getCenter().y);
+					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+
+
+					toTransform = false;
 				}
 
-				//Set Level
-				switch (lvl)
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+				{
+					for (auto i : coOpAray)
+					{
+						std::cout << i.second->getScore() << "\t" << i.second->getLives() << std::endl;
+					}
+					std::cout << p1.getScore() << "\t" << p1.getLives() << std::endl;
+
+				}
+
+				//StartScreen
+				while (lev == startScreen)
+				{
+					window.clear();
+					while (window.pollEvent(event))
+					{
+
+						if (event.type == sf::Event::Closed)
+							window.close();
+					}
+					//Intro
+					sf::Text Intro;
+					Intro.setFont(font);
+					Intro.setPosition(800, 400);
+					Intro.setString("Welcome to Coool Game\n Press 'Enter' to start a new game\n Press 'Q' to continue from your last adventure");
+					window.draw(Intro);
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+					{
+						//start level 1
+						_pClient->lvl = 1;
+					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+					{
+						//Get level from file
+						file >> _pClient->lvl;
+						file.close();
+					}
+
+					//Set Level
+					switch (_pClient->lvl)
+					{
+					case 0:
+					{
+
+					}break;
+					case 1:
+					{
+						lev = lev1;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level1.spawnPoints.x, level1.spawnPoints.y);
+						p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
+						setStufff(p1, currState);
+					}break;
+					case 2:
+					{
+						level1.checks[0].draw(window);
+						lev = lev1;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level1.checks[0].x, level1.checks[0].y);
+						p1.setLocation(level1.checks[0].x, level1.checks[0].y - 10);
+					}break;
+					case 3:
+					{
+						lev = lev2;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level2.spawnPoints.x, level2.spawnPoints.y);
+						p1.setLocation(level2.spawnPoints.x, level2.spawnPoints.y - 10);
+
+					}break;
+					case 4:
+					{
+						lev = lev2;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level2.checks[0].x, level2.checks[0].y);
+						p1.setLocation(level2.checks[0].x, level2.checks[0].y);
+					}break;
+					case 5:
+					{
+						lev = lev3;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level3.spawnPoints.x, level3.spawnPoints.y);
+						p1.setLocation(level3.spawnPoints.x, level3.spawnPoints.y);
+					}
+					case 6:
+					{
+						lev = lev3;
+						p1.reset();
+						p1.alive = true;
+						level2.placePlats(2);
+						p1.setSpawnPos(level3.checks[0].x, level3.checks[0].y);
+					}
+					default:
+					{
+						_pClient->lvl = 1;
+					}
+					break;
+					}
+
+					window.display();
+				}
+
+				if (_pClient->lvlFlag && lev == spectate)
+				{
+					p1.setScore(0);
+					p1.setLives(4);
+					p1.alive = true;
+				}
+
+				switch (_pClient->lvl)
 				{
 				case 0:
 				{
@@ -718,662 +785,138 @@ int main()
 				case 1:
 				{
 					lev = lev1;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level1.spawnPoints.x, level1.spawnPoints.y);
-					p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
 					setStufff(p1, currState);
 				}break;
+				
 				case 2:
 				{
-					level1.checks[0].draw(window);
-					lev = lev1;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level1.checks[0].x, level1.checks[0].y);
-					p1.setLocation(level1.checks[0].x, level1.checks[0].y - 10);
+					lev = lev2;
+				
 				}break;
+				
 				case 3:
 				{
-					lev = lev2;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level2.spawnPoints.x, level2.spawnPoints.y);
-					p1.setLocation(level2.spawnPoints.x, level2.spawnPoints.y - 10);
-
+					lev = lev3;
 				}break;
+
 				case 4:
 				{
-					lev = lev2;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level2.checks[0].x, level2.checks[0].y);
-					p1.setLocation(level2.checks[0].x, level2.checks[0].y);
+					lev = win;
 				}break;
-				case 5:
-				{
-					lev = lev3;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level3.spawnPoints.x, level3.spawnPoints.y);
-					p1.setLocation(level3.spawnPoints.x, level3.spawnPoints.y);
-				}
-				case 6:
-				{
-					lev = lev3;
-					p1.reset();
-					p1.alive = true;
-					level2.placePlats(2);
-					p1.setSpawnPos(level3.checks[0].x, level3.checks[0].y);
-				}
+				
 				default:
 				{
-					lvl = 1;
+					_pClient->lvl = 1;
 				}
 				break;
 				}
 
-				window.display();
-			}
-
-
-
-			//Debug Gravity Change
-			if (gravChange)
-			{
-				p1.setGrav(gravVal);
-				gravChange = false;
-			}
-
-			//Debug Player Speed
-			if (pSpeedChange)
-			{
-				p1.setSpeed(plaSpeed);
-				pSpeedChange = false;
-			}
-
-
-			//Debug Enemy Speed
-			if (eSpeedChange)
-			{
-				en1.setSpeed(enSpeed);
-				eSpeedChange = false;
-			}
-
-			//Debug Player God
-			if (god)
-			{
-				p1.setGod(true);
-			}
-			else
-			{
-				p1.setGod(false);
-			}
-
-
-			float deltaTime = (float)sfClock.restart().asMilliseconds();
-
-			//globalTime += deltaTime;
-			window.clear();
-			//p1.setLocation(50, 50);
-
-
-			//Player Movement
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			{
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-					p1.key = 'J';
-				else
-					p1.key = 'A';
-				if (p1.sp.getGlobalBounds().left < view1.getCenter().x - 100)
+				//Debug Gravity Change
+				if (gravChange)
 				{
-					view1.setCenter(view1.getCenter().x + p1.dx * deltaTime, view1.getCenter().y);
-					lives.setPosition(lives.getPosition().x + p1.dx * deltaTime, lives.getPosition().y);
-					score.setPosition(lives.getPosition().x + p1.dx * deltaTime, score.getPosition().y);
+					p1.setGrav(gravVal);
+					gravChange = false;
+				}
 
-
+				//Debug Player Speed
+				if (pSpeedChange)
+				{
+					p1.setSpeed(plaSpeed);
+					pSpeedChange = false;
 				}
 
 
-			}
-
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			{
-
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-					p1.key = 'L';
-				else
-					p1.key = 'D';
-				if (p1.sp.getGlobalBounds().left > view1.getCenter().x + 100)
+				//Debug Enemy Speed
+				if (eSpeedChange)
 				{
-					view1.setCenter(view1.getCenter().x + p1.dx * deltaTime, view1.getCenter().y);
-					lives.setPosition(lives.getPosition().x + p1.dx * deltaTime, lives.getPosition().y);
-					score.setPosition(lives.getPosition().x + p1.dx * deltaTime, score.getPosition().y);
-
+					en1.setSpeed(enSpeed);
+					eSpeedChange = false;
 				}
 
-
-			}
-
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
-			{
-				p1.attkey = 'X';
-			}
-
-			//Debug Menu
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-			{
-				ShowWindow(hDlg, 1);
-			}
-
-			
-			p1.update(deltaTime);
-			p1.draw(window);
-
-			if (p1.getBull() != nullptr)
-			{
-				p1.getBull()->setTexture("Assets/bullet.png");
-
-				p1.getBull()->move(deltaTime);
-				p1.getBull()->draw(window);
-			}
-
-			//Damage Player
-			if (p1.y > 1000)
-			{
-				if (!god)
+				//Debug Player God
+				if (god)
 				{
-					if (p1.kill())
-					{
-						lev = gameOver;
-					}
+					p1.setGod(true);
 				}
 				else
 				{
-					p1.setLocation(p1.getSpawnPos().x, p1.getSpawnPos().y);
-				}
-				view1.setCenter(p1.x, 540);
-				lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-				lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-
-			}
-
-			//Level 1 Hajime
-			if (lev == lev1)
-			{
-
-				// Message
-				msg.setString("Check if something changed in the back");
-				msg.setPosition(2300, 400);
-				if (show)
-					window.draw(msg);
-
-				//Moving platform test
-				mover.draw(window);
-				if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-				{
-					mover.move(1, deltaTime);
-				}
-				if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-				{
-					mover.move(-1, deltaTime);
+					p1.setGod(false);
 				}
 
-				lives.setString(std::to_string(p1.getLives()));
-				window.draw(lives);
-				//en1.setLocation(40, 950);
-				score.setString(std::to_string(p1.getScore()));
-				window.draw(score);
 
-				enVec[0].move(1000, 1, p1, deltaTime);
-				enVec[0].draw(window);
+				float deltaTime = (float)sfClock.restart().asMilliseconds();
 
-				enVec[1].move(400, 1, p1, deltaTime);
-				enVec[1].draw(window);
+				//globalTime += deltaTime;
+				window.clear();
+				//p1.setLocation(50, 50);
 
-				level1.portal.draw(window);
-				// Level Promote
-				if (Collision::BoundingBoxTest(level1.portal.sp, p1.sp))
+
+				//Player Movement
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 				{
-					lfile.open("Assets/level.txt");
-					p1.setSpawnPos(level2.spawnPoints.x, level2.spawnPoints.y);
-					lev = lev2;
-					show = false;
-					lfile << 3;
-					lfile.close();
-				}
-				for (int i = 0; i < 5; i++)
-				{
-					level1.plats[i].draw(window);
-				}
-
-				for (auto& i : enVec)
-				{
-					if (Collision::BoundingBoxTest(i.sp, p1.sp))
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+						p1.key = 'J';
+					else
+						p1.key = 'A';
+					if (p1.sp.getGlobalBounds().left < view1.getCenter().x - 100)
 					{
-						if (p1.kill())
+						view1.setCenter(view1.getCenter().x + p1.dx * deltaTime, view1.getCenter().y);
+						lives.setPosition(lives.getPosition().x + p1.dx * deltaTime, lives.getPosition().y);
+						score.setPosition(lives.getPosition().x + p1.dx * deltaTime, score.getPosition().y);
 
-							lev = gameOver;
-						view1.setCenter(p1.x, 540);
-						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-					}
-					if (p1.getBull() != nullptr && i.alive)
-					{
-						if (Collision::BoundingBoxTest(i.sp, p1.getBull()->sp))
-						{
-							p1.getBull()->destroy();
-							i.alive = false;
-							p1.addScore();
-						}
-					}
-				}
-				level1.checks[0].draw(window);
-				if (Collision::BoundingBoxTest(level1.checks[0].sp, p1.sp))
-				{
-					lfile.open("Assets/level.txt");
-					lfile << 2;
-					lfile.close();
-					p1.setSpawnPos(level1.checks[0].sp.getPosition().x, level1.checks[0].sp.getPosition().y);
-					jedi = true;
-					show = true;
-					mover.sp.setColor(sf::Color::Green);
-				}
-				else
-				{
-					jedi = false;
-					mover.sp.setColor(sf::Color::White);
-				}
-				int num;
-				if (show)
-					num = 7;
-				else num = 5;
-
-				//Platform Collisiions
-				for (int i = 0; i < num; i++)
-				{
-					if (Collision::BoundingBoxTest(level1.plats[i].sp, p1.sp))
-					{
-						if (p1.y < level1.plats[i].y - 60)
-						{
-							p1.grounded = true;
-							break;
-						}
-
-						else
-						{
-							if (p1.dx < 0 && p1.x > level1.plats[i].x)
-							{
-								p1.x += 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-							if (p1.dx > 0 && p1.x - 32 < level1.plats[i].x)
-							{
-								p1.x -= 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-						}
-					}
-					else p1.grounded = false;
-				}
-				{
-					//Platforms invisible unless you go through checkpoint
-					level1.plats[4].draw(window);
-					Collision::BoundingBoxTest(level1.plats[4].sp, p1.sp);
-					//level1.plats[i].draw(window);
-					if (show)
-					{
-						level1.plats[5].draw(window);
 
 					}
+
+
 				}
-			}
 
-			//level 2 code
-			if (lev == lev2)
-			{
 
-				// Message
-				msg.setString("See that Platform just turned green\n use Up and Down arrow to move it");
-				msg.setPosition(1000, 400);
-				if (jedi)
-					window.draw(msg);
-				lives.setString(std::to_string(p1.getLives()));
-				window.draw(lives);
-
-				score.setString(std::to_string(p1.getScore()));
-				window.draw(score);
-				//draw level platforms
-				level2.plats[0].draw(window);
-				level2.plats[1].draw(window);
-				level2.trigger.draw(window);
-				level2.portal.draw(window);
-				//Collisions  for platforms
-				for (int i = 0; i < 2; i++)
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 				{
-					if (Collision::BoundingBoxTest(level2.plats[i].sp, p1.sp))
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+						p1.key = 'L';
+					else
+						p1.key = 'D';
+					if (p1.sp.getGlobalBounds().left > view1.getCenter().x + 100)
 					{
-						if (p1.y < level2.plats[i].y - 60)
-						{
-							p1.grounded = true;
-							break;
-						}
+						view1.setCenter(view1.getCenter().x + p1.dx * deltaTime, view1.getCenter().y);
+						lives.setPosition(lives.getPosition().x + p1.dx * deltaTime, lives.getPosition().y);
+						score.setPosition(lives.getPosition().x + p1.dx * deltaTime, score.getPosition().y);
 
-						else
-						{
-							if (p1.dx < 0 && p1.x > level2.plats[i].x)
-							{
-								p1.x += 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-							if (p1.dx > 0 && p1.x - 32 < level2.plats[i].x)
-							{
-								p1.x -= 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-						}
 					}
-					else p1.grounded = false;
+
+
 				}
 
-				// Next level code
-				if (Collision::BoundingBoxTest(level2.portal.sp, p1.sp))
+
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 				{
-					lfile.open("Assets/level.txt");
-					lfile << 5;
-					lfile.close();
-					p1.setSpawnPos(level3.spawnPoints.x, level3.spawnPoints.y);
-					p1.setLocation(level3.spawnPoints.x, level3.spawnPoints.y);
-					view1.setCenter(level3.spawnPoints.x, 540);
-					lev = lev3;
-
+					p1.attkey = 'X';
 				}
 
-				// Trigger moving platform
-
-				if (Collision::BoundingBoxTest(level2.trigger.sp, p1.sp))
+				//Debug Menu
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 				{
-					level2.plats[1].sp.setColor(sf::Color::Green);
-					jedi = true;
-				}
-				else
-				{
-					level2.plats[1].sp.setColor(sf::Color::White);
-					jedi = false;
-				}
-				//Move platforms
-				if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-				{
-					level2.plats[1].move(1, deltaTime);
-				}
-
-				if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-				{
-					level2.plats[1].move(-1, deltaTime);
+					ShowWindow(hDlg, 1);
 				}
 
 
-				//if (Collision::BoundingBoxTest(p1.sp, level2.plats[1].sp))
-				//{
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				//	{
-				//		//level2.plats[1].setLocation(level2.plats[1].x - 100, level2.plats[1].y);
-				//		level2.plats[1].sp.setOrigin(35, 0.5);
-				//		if (level2.plats[1].sp.getRotation() < 45 || (level2.plats[1].sp.getRotation()<360 && level2.plats[1].sp.getRotation()>275))
-				//		level2.plats[1].sp.rotate(0.2 * deltaTime);
-				//		p1.y = p1.y + (tan(level2.plats[1].sp.getRotation()) / (p1.x - level2.plats[1].x));
-				//		p1.setLocation(p1.x, p1.y);
-				//		//level2.plats[1].setLocation(level2.plats[1].x + 100, level2.plats[1].y);
-				//	}
+				p1.update(deltaTime);
+				p1.draw(window);
 
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				//	{
-				//		
-				//		//level2.plats[1].setLocation(level2.plats[1].x + 100, level2.plats[1].y);
-				//		level2.plats[1].sp.setOrigin(35, 0.5);
-				//		if (level2.plats[1].sp.getRotation() < 275 || level2.plats[1].sp.getRotation() > 90)
-				//		level2.plats[1].sp.rotate(-0.2 * deltaTime);
-				//		p1.y = p1.y + ((level2.plats[1].x - p1.x)/ tan(level2.plats[1].sp.getRotation()));
-				//		p1.setLocation(p1.x, p1.y);
-				//		//level2.plats[1].setLocation(level2.plats[1].x - 100, level2.plats[1].y);
-				//	}
-				//}
-			}
-			// Level 3
-			if (lev == lev3)
-			{
-				msg.setString("A Lever, I wonder what it can do.\nTry using Left and Right arrow keys");
-				msg.setPosition(1000, 800);
-				if (jedi)
-					window.draw(msg);
-				lives.setString(std::to_string(p1.getLives()));
-				score.setString(std::to_string(p1.getScore()));
-				lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-				window.draw(lives);
-
-
-				score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-				window.draw(score);
-				//Draw Lever
-				level3.trigger.draw(window);
-
-				//Draw Platforms
-				for (int i = 0; i < 2; i++)
-				{
-					level3.plats[i].draw(window);
-				}
-
-				level3.portal.setTexture("Assets/portal.png");
-				//Draw portal
-				level3.portal.draw(window);
-
-				// Return platform to origin
-				if (!Collision::BoundingBoxTest(p1.sp, level3.plats[1].sp))
-				{
-					if (level3.plats[1].x > 650)
-					{
-						level3.plats[1].move(-2, deltaTime);
-						level3.trigger.move(-2, deltaTime);
-					}
-					if (level3.plats[1].x < 600)
-					{
-						level3.plats[1].move(2, deltaTime);
-						level3.trigger.move(2, deltaTime);
-					}
-				}
-
-
-
-				//Game End
-				if (Collision::BoundingBoxTest(p1.sp, level3.portal.sp))
-				{
-					lev = win;
-				}
-
-				//Move Platform
-				if (Collision::BoundingBoxTest(level3.trigger.sp, p1.sp))
-				{
-					jedi = true;
-				}
-				else
-				{
-					jedi = false;
-					level3.trigger.setTexture("Assets/leverStraight.png");
-				}
-
-				if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				{
-					level3.trigger.setTexture("Assets/leverLeft.png");
-					level3.plats[1].move(-2, deltaTime);
-					level3.trigger.move(-2, deltaTime);
-					p1.x -= 0.2f * deltaTime;
-					p1.setLocation(p1.x, p1.y);
-					view1.setCenter(view1.getCenter().x - 0.2f * deltaTime, view1.getCenter().y);
-					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-				}
-
-
-				else if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				{
-					level3.trigger.setTexture("Assets/leverRight.png");
-					level3.plats[1].move(2, deltaTime);
-					level3.trigger.move(2, deltaTime);
-					p1.x += 0.2f * deltaTime;
-					p1.setLocation(p1.x, p1.y);
-					view1.setCenter(view1.getCenter().x + 0.2f * deltaTime, view1.getCenter().y);
-					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-				}
-
-				else
-					level3.trigger.setTexture("Assets/leverStraight.png");
-				//Platform Collissions
-				for (int i = 0; i < 2; i++)
-				{
-					if (Collision::BoundingBoxTest(level3.plats[i].sp, p1.sp))
-					{
-						if (p1.y < level3.plats[i].y - 60)
-						{
-							p1.grounded = true;
-							break;
-						}
-
-						else
-						{
-							if (p1.dx < 0 && p1.x > level3.plats[i].x)
-							{
-								p1.x += 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-							if (p1.dx > 0 && p1.x - 32 < level3.plats[i].x)
-							{
-								p1.x -= 10;
-								p1.sp.setPosition(p1.x, p1.y);
-							}
-						}
-					}
-					else p1.grounded = false;
-				}
-			}
-			//GameOver Code
-			if (lev == gameOver)
-			{
-				lfile.open("Assets/level.txt");
-				lfile << 1;
-				lfile.close();
-				p1.alive = false;
-				view1.setCenter(960, 540);
-				sf::Text gmOver;
-				gmOver.setFont(font);
-				gmOver.setPosition(800, 400);
-				gmOver.setString("Game Over\nTry again\n Press Enter to retry\n Press T to go to titleScreen");
-				gmOver.setScale(3, 3);
-				window.draw(gmOver);
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-				{
-					lev = lev1;
-					p1.reset();
-					p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
-					view1.setCenter(p1.x, 540);
-					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-					p1.alive = true;
-					level2.placePlats(2);
-					level1.placePlats(1);
-					level3.placePlats(3);
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
-				{
-					lvl = 0;
-					lev = startScreen;
-				}
-			}
-
-			//Win Code
-			if (lev == win)
-			{
-				lfile.open("Assets/level.txt");
-				lfile << 1;
-				lfile.close();
-				p1.alive = false;
-				view1.setCenter(960, 540);
-				sf::Text gmOver;
-				gmOver.setFont(font);
-				gmOver.setString("Congratulations You won\n Press Enter to play again\nPress T to Return to main menu");
-				gmOver.setScale(3, 3);
-				window.draw(gmOver);
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-				{
-					lev = lev1;
-					p1.reset();
-					p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
-					view1.setCenter(p1.x, 540);
-					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
-					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
-					p1.alive = true;
-					level2.placePlats(2);
-					level1.placePlats(1);
-					level3.placePlats(3);
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
-				{
-					lvl = 0;
-					lev = startScreen;
-				}
-
-			}
-
-			if (hasChanged(p1, currState))
-			{
-
-				setStufff(p1, currState);
-				//	//Put the message into a packet structure
-				TPacket _packet;
-				std::string msg = toSend(currState);
-				_packet.Serialize(DATA, &msg[0]);
-				_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
-
-			}
-			else
-			{
 				
-			}
 
-
-			//Scuffed Client calling stuff using bools
-			if (_pClient != nullptr)
-			{
-				if (_pClient->initFlag)
+				if (hasChanged(p1, currState))
 				{
-					std::string msg = _pClient->initMsg;
-					std::string temp = "";
-					int num = msg[0];
-					msg = &msg[2];
-					for (int i = 0; msg[i] != '\0'; i++)
-					{
-						if (msg[i] == '#')
-						{
-							additional = new player(100.0f, 200.0f);
-							std::pair<std::string, player*> t(temp, additional);
-							additional->setTexture("Assets/Warrior.png");
-							coOpAray.insert(t);
-							temp = "";
-						}
+					setStufff(p1, currState);
+					currState.uName = _pClient->name;
 
-						else
-						{
-							temp += msg[i];
-						}
-					}
-					_pClient->initFlag = false;
+					//	//Put the message into a packet structure
+					TPacket _packet;
+					std::string msg = toSend(currState);
+					_packet.Serialize(DATA, &msg[0]);
+					_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
 				}
 
 				if (_pClient->flag)
@@ -1384,27 +927,691 @@ int main()
 
 					for (auto i : coOpAray)
 					{
-						if (i.first == pInfo.uName)
+						if (i.first != pInfo.uName)
 						{
 							stuffSet(i.second, pInfo);
-							if((pInfo.shoot))
-								i.second->attkey = 'X'; 
+							if ((pInfo.shoot))
+								i.second->attkey = 'X';
+						}
+					}
+				
+					_pClient->flag = false;
+				}
+				for (auto i : coOpAray)
+				{
+					i.second->ups(deltaTime);
+					//	i.second->setTexture("Assets/Warrior.png");
+					i.second->draw(window);
+				}
+
+				if (p1.getBull() != nullptr)
+				{
+					p1.getBull()->setTexture("Assets/bullet.png");
+
+					p1.getBull()->move(deltaTime);
+					p1.getBull()->draw(window);
+				}
+
+				//Damage Player
+				if (p1.y > 1000)
+				{
+					if (!god)
+					{
+						if (p1.kill())
+						{
+							lev = spectate;
+						}
+					}
+					else
+					{
+						p1.setLocation(p1.getSpawnPos().x, p1.getSpawnPos().y);
+					}
+					view1.setCenter(p1.x, 540);
+					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+
+				}
+
+				//Level 1 Hajime
+				if (lev == lev1)
+				{
+
+					// Message
+					msg.setString("Check if something changed in the back");
+					msg.setPosition(2300, 400);
+					if (show)
+						window.draw(msg);
+
+					//Moving platform test
+					mover.draw(window);
+					if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+					{
+						mover.move(1, deltaTime);
+					}
+					if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+					{
+						mover.move(-1, deltaTime);
+					}
+
+					lives.setString(std::to_string(p1.getLives()));
+					window.draw(lives);
+					//en1.setLocation(40, 950);
+					score.setString(std::to_string(p1.getScore()));
+					window.draw(score);
+
+					enVec[0].move(1000, 1, p1, deltaTime);
+					enVec[0].draw(window);
+
+					enVec[1].move(400, 1, p1, deltaTime);
+					enVec[1].draw(window);
+
+					level1.portal.draw(window);
+					// Level Promote
+					if (Collision::BoundingBoxTest(level1.portal.sp, p1.sp))
+					{
+						lfile.open("Assets/level.txt");
+						p1.setSpawnPos(level2.spawnPoints.x, level2.spawnPoints.y);
+						lev = lev2;
+						_pClient->sendLvl(2);
+						_pClient->lvl = 2;
+						show = false;
+						lfile << 3;
+						lfile.close();
+					}
+					for (int i = 0; i < 5; i++)
+					{
+						level1.plats[i].draw(window);
+					}
+
+					for (auto& i : enVec)
+					{
+						if (Collision::BoundingBoxTest(i.sp, p1.sp))
+						{
+							if (p1.kill())
+
+								lev = gameOver;
+							view1.setCenter(p1.x, 540);
+							lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+							score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+						}
+						if (p1.getBull() != nullptr && i.alive)
+						{
+							if (Collision::BoundingBoxTest(i.sp, p1.getBull()->sp))
+							{
+								p1.getBull()->destroy();
+								i.alive = false;
+								p1.addScore();
+							}
+						}
+					}
+					level1.checks[0].draw(window);
+					if (Collision::BoundingBoxTest(level1.checks[0].sp, p1.sp))
+					{
+						lfile.open("Assets/level.txt");
+						lfile << 2;
+						lfile.close();
+						p1.setSpawnPos(level1.checks[0].sp.getPosition().x, level1.checks[0].sp.getPosition().y);
+						jedi = true;
+						show = true;
+						mover.sp.setColor(sf::Color::Green);
+					}
+					else
+					{
+						jedi = false;
+						mover.sp.setColor(sf::Color::White);
+					}
+					int num;
+					if (show)
+						num = 7;
+					else num = 5;
+
+					//Platform Collisiions
+					for (int i = 0; i < num; i++)
+					{
+						if (Collision::BoundingBoxTest(level1.plats[i].sp, p1.sp))
+						{
+							if (p1.y < level1.plats[i].y - 60)
+							{
+								p1.grounded = true;
+								break;
+							}
+
+							else
+							{
+								if (p1.dx < 0 && p1.x > level1.plats[i].x)
+								{
+									p1.x += 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+								if (p1.dx > 0 && p1.x - 32 < level1.plats[i].x)
+								{
+									p1.x -= 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+							}
+						}
+						else p1.grounded = false;
+					}
+					{
+						//Platforms invisible unless you go through checkpoint
+						level1.plats[4].draw(window);
+						Collision::BoundingBoxTest(level1.plats[4].sp, p1.sp);
+						//level1.plats[i].draw(window);
+						if (show)
+						{
+							level1.plats[5].draw(window);
+
 						}
 					}
 				}
-			}
 
-			for (auto i : coOpAray)
-			{
-				i.second->update(deltaTime);
-			}
+				//level 2 code
+				if (lev == lev2)
+				{
 
-			window.display();
+					// Message
+					msg.setString("See that Platform just turned green\n use Up and Down arrow to move it");
+					msg.setPosition(1000, 400);
+					if (jedi)
+						window.draw(msg);
+					lives.setString(std::to_string(p1.getLives()));
+					window.draw(lives);
 
+					score.setString(std::to_string(p1.getScore()));
+					window.draw(score);
+					//draw level platforms
+					level2.plats[0].draw(window);
+					level2.plats[1].draw(window);
+					level2.trigger.draw(window);
+					level2.portal.draw(window);
+					//Collisions  for platforms
+					for (int i = 0; i < 2; i++)
+					{
+						if (Collision::BoundingBoxTest(level2.plats[i].sp, p1.sp))
+						{
+							if (p1.y < level2.plats[i].y - 60)
+							{
+								p1.grounded = true;
+								break;
+							}
+
+							else
+							{
+								if (p1.dx < 0 && p1.x > level2.plats[i].x)
+								{
+									p1.x += 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+								if (p1.dx > 0 && p1.x - 32 < level2.plats[i].x)
+								{
+									p1.x -= 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+							}
+						}
+						else p1.grounded = false;
+					}
+
+					// Next level code
+					if (Collision::BoundingBoxTest(level2.portal.sp, p1.sp))
+					{
+						lfile.open("Assets/level.txt");
+						lfile << 5;
+						lfile.close();
+						p1.setSpawnPos(level3.spawnPoints.x, level3.spawnPoints.y);
+						p1.setLocation(level3.spawnPoints.x, level3.spawnPoints.y);
+
+						_pClient->sendLvl(3);
+						_pClient->lvl = 3;
+
+						view1.setCenter(level3.spawnPoints.x, 540);
+						lev = lev3;
+						_pClient->lvl = 3;
+
+					}
+
+					// Trigger moving platform
+
+					if (Collision::BoundingBoxTest(level2.trigger.sp, p1.sp))
+					{
+						level2.plats[1].sp.setColor(sf::Color::Green);
+						jedi = true;
+					}
+					else
+					{
+						level2.plats[1].sp.setColor(sf::Color::White);
+						jedi = false;
+					}
+					//Move platforms
+					if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+					{
+						level2.plats[1].move(1, deltaTime);
+						TPacket _packetToSend;
+						std::string data = _pClient->name + "#2#";
+						data += std::to_string(level2.plats[1].y);
+
+						_packetToSend.Serialize(LEVELDAT, &data[0]);
+						_pClient->SendData(_packetToSend.PacketData);
+					}
+
+					if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+					{
+						TPacket _packetToSend;
+						std::string data = _pClient->name + "#2#";
+						data += std::to_string(level2.plats[1].y);
+
+						_packetToSend.Serialize(LEVELDAT, &data[0]);
+						_pClient->SendData(_packetToSend.PacketData);
+
+						level2.plats[1].move(-1, deltaTime);
+					}
+
+
+					//if (Collision::BoundingBoxTest(p1.sp, level2.plats[1].sp))
+					//{
+					//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+					//	{
+					//		//level2.plats[1].setLocation(level2.plats[1].x - 100, level2.plats[1].y);
+					//		level2.plats[1].sp.setOrigin(35, 0.5);
+					//		if (level2.plats[1].sp.getRotation() < 45 || (level2.plats[1].sp.getRotation()<360 && level2.plats[1].sp.getRotation()>275))
+					//		level2.plats[1].sp.rotate(0.2 * deltaTime);
+					//		p1.y = p1.y + (tan(level2.plats[1].sp.getRotation()) / (p1.x - level2.plats[1].x));
+					//		p1.setLocation(p1.x, p1.y);
+					//		//level2.plats[1].setLocation(level2.plats[1].x + 100, level2.plats[1].y);
+					//	}
+
+					//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+					//	{
+					//		
+					//		//level2.plats[1].setLocation(level2.plats[1].x + 100, level2.plats[1].y);
+					//		level2.plats[1].sp.setOrigin(35, 0.5);
+					//		if (level2.plats[1].sp.getRotation() < 275 || level2.plats[1].sp.getRotation() > 90)
+					//		level2.plats[1].sp.rotate(-0.2 * deltaTime);
+					//		p1.y = p1.y + ((level2.plats[1].x - p1.x)/ tan(level2.plats[1].sp.getRotation()));
+					//		p1.setLocation(p1.x, p1.y);
+					//		//level2.plats[1].setLocation(level2.plats[1].x - 100, level2.plats[1].y);
+					//	}
+					//}
+				}
+				// Level 3
+				if (lev == lev3)
+				{
+					msg.setString("A Lever, I wonder what it can do.\nTry using Left and Right arrow keys");
+					msg.setPosition(1000, 800);
+					if (jedi)
+						window.draw(msg);
+					lives.setString(std::to_string(p1.getLives()));
+					score.setString(std::to_string(p1.getScore()));
+					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+					window.draw(lives);
+
+
+					score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+					window.draw(score);
+					//Draw Lever
+					level3.trigger.draw(window);
+
+					//Draw Platforms
+					for (int i = 0; i < 2; i++)
+					{
+						level3.plats[i].draw(window);
+					}
+
+					level3.portal.setTexture("Assets/portal.png");
+					//Draw portal
+					level3.portal.draw(window);
+
+					// Return platform to origin
+					if (!Collision::BoundingBoxTest(p1.sp, level3.plats[1].sp))
+					{
+						if (level3.plats[1].x > 650)
+						{
+							level3.plats[1].move(-2, deltaTime);
+							level3.trigger.move(-2, deltaTime);
+							TPacket _packetToSend;
+							std::string data = _pClient->name + "#3#";
+							data += std::to_string(level3.plats[1].x);
+
+							_packetToSend.Serialize(LEVELDAT, &data[0]);
+							_pClient->SendData(_packetToSend.PacketData);
+
+
+							setStufff(p1, currState);
+							currState.uName = _pClient->name;
+
+							//	//Put the message into a packet structure
+							TPacket _packet;
+							std::string msg = toSend(currState);
+							_packet.Serialize(DATA, &msg[0]);
+							_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
+						
+								
+						}
+						if (level3.plats[1].x < 600)
+						{
+							level3.plats[1].move(2, deltaTime);
+							level3.trigger.move(2, deltaTime);
+							TPacket _packetToSend;
+							std::string data = _pClient->name + "#3#";
+							data += std::to_string(level3.plats[1].x);
+
+							_packetToSend.Serialize(LEVELDAT, &data[0]);
+							_pClient->SendData(_packetToSend.PacketData);
+
+							setStufff(p1, currState);
+							currState.uName = _pClient->name;
+
+							//	//Put the message into a packet structure
+							TPacket _packet;
+							std::string msg = toSend(currState);
+							_packet.Serialize(DATA, &msg[0]);
+							_rNetwork.GetInstance().GetNetworkEntity()->SendData(_packet.PacketData);
+						}
+					}
+
+					
+
+
+
+					//Game End
+					if (Collision::BoundingBoxTest(p1.sp, level3.portal.sp))
+					{
+						lev = win;
+
+						_pClient->sendLvl(4);
+						_pClient->lvl = 4;
+					}
+
+					//Move Platform
+					if (Collision::BoundingBoxTest(level3.trigger.sp, p1.sp))
+					{
+						jedi = true;
+					}
+					else
+					{
+						jedi = false;
+						level3.trigger.setTexture("Assets/leverStraight.png");
+					}
+
+					if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+					{
+						level3.trigger.setTexture("Assets/leverLeft.png");
+						level3.plats[1].move(-2, deltaTime);
+						level3.trigger.move(-2, deltaTime);
+						p1.x -= 0.2f * deltaTime;
+						p1.setLocation(p1.x, p1.y);
+						view1.setCenter(view1.getCenter().x - 0.2f * deltaTime, view1.getCenter().y);
+						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+
+						TPacket _packetToSend;
+						std::string data = _pClient->name + "#3#";
+						data += std::to_string(level3.plats[1].x);
+
+						_packetToSend.Serialize(LEVELDAT, &data[0]);
+						_pClient->SendData(_packetToSend.PacketData);
+
+						setStufff(p1, currState);
+						currState.uName = _pClient->name;
+
+						
+					}
+
+
+					else if (jedi && sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+					{
+						level3.trigger.setTexture("Assets/leverRight.png");
+						level3.plats[1].move(2, deltaTime);
+						level3.trigger.move(2, deltaTime);
+						p1.x += 0.2f * deltaTime;
+						p1.setLocation(p1.x, p1.y);
+						view1.setCenter(view1.getCenter().x + 0.2f * deltaTime, view1.getCenter().y);
+						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+
+						TPacket _packetToSend;
+						std::string data = _pClient->name + "#3#";
+						data += std::to_string(level3.plats[1].x);
+
+						_packetToSend.Serialize(LEVELDAT, &data[0]);
+						_pClient->SendData(_packetToSend.PacketData);
+
+						setStufff(p1, currState);
+						currState.uName = _pClient->name;
+
+					
+					}
+
+					else
+						level3.trigger.setTexture("Assets/leverStraight.png");
+					//Platform Collissions
+					for (int i = 0; i < 2; i++)
+					{
+						if (Collision::BoundingBoxTest(level3.plats[i].sp, p1.sp))
+						{
+							if (p1.y < level3.plats[i].y - 60)
+							{
+								p1.grounded = true;
+								break;
+							}
+
+							else
+							{
+								if (p1.dx < 0 && p1.x > level3.plats[i].x)
+								{
+									p1.x += 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+								if (p1.dx > 0 && p1.x - 32 < level3.plats[i].x)
+								{
+									p1.x -= 10;
+									p1.sp.setPosition(p1.x, p1.y);
+								}
+							}
+						}
+						else p1.grounded = false;
+					}
+				}
+
+				if (_pClient->lvlDatFlag)
+				{
+					std::string temp = "";
+					temp += _pClient->lvlDatMsg[1];
+					_pClient->lvlDatMsg = &_pClient->lvlDatMsg[3];
+
+					switch (std::stoi(temp))
+					{
+					case 2:
+					{
+						level2.plats[1].setLocation(level2.plats[1].sp.getPosition().x, std::stof(_pClient->lvlDatMsg));
+					}break;
+
+					case 3:
+					{
+						level3.plats[1].setLocation(std::stof(_pClient->lvlDatMsg),level3.plats[1].sp.getPosition().y);
+
+						level3.trigger.setLocation(std::stof(_pClient->lvlDatMsg) + 200, level3.plats[1].sp.getPosition().y - 20);
+					}break;
+					default:
+						break;
+					}
+
+					_pClient->lvlDatFlag = false;
+				}
+				//GameOver Code
+				if (lev == gameOver)
+				{
+					lfile.open("Assets/level.txt");
+					lfile << 1;
+					lfile.close();
+					p1.alive = false;
+					view1.setCenter(960, 540);
+					sf::Text gmOver;
+					gmOver.setFont(font);
+					gmOver.setPosition(800, 400);
+					gmOver.setString("Game Over\nTry again\n Press Enter to retry\n Press T to go to titleScreen");
+					gmOver.setScale(3, 3);
+					window.draw(gmOver);
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+					{
+						lev = lev1;
+						p1.reset();
+						p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
+						view1.setCenter(p1.x, 540);
+						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+						p1.alive = true;
+						level2.placePlats(2);
+						level1.placePlats(1);
+						level3.placePlats(3);
+					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+					{
+						_pClient->lvl = 0;
+						lev = startScreen;
+					}
+				}
+
+				if (lev == spectate)
+				{
+					lfile.open("Assets/level.txt");
+					lfile << 1;
+					lfile.close();
+					p1.alive = false;
+					sf::Text gmOver;
+					gmOver.setFont(font);
+					gmOver.setPosition(800, 400);
+					gmOver.setString("You are ded, you can still spectate, You will be revived in next round");
+					gmOver.setScale(3, 3);
+					window.draw(gmOver);
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+					{
+						view1.setCenter(view1.getCenter().x - 0.3 * deltaTime, view1.getCenter().y);
+					}
+
+					bool flag = false;
+					for (auto i : coOpAray)
+					{
+ 						if (i.second->getLives() == 0)
+						{
+							flag = true;
+						}
+						else 
+						{
+							flag = false;
+							break;
+						}
+					}
+
+
+					if (flag)
+					{
+						lev = gameOver;
+					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+					{
+						view1.setCenter(view1.getCenter().x + 0.3 * deltaTime, view1.getCenter().y);
+					}
+
+					gmOver.setPosition(view1.getCenter());
+				}
+
+				//Win Code
+				if (lev == win)
+				{
+					lfile.open("Assets/level.txt");
+					lfile << 1;
+					lfile.close();
+					p1.alive = false;
+					view1.setCenter(960, 540);
+					sf::Text gmOver;
+					gmOver.setFont(font);
+					gmOver.setString("Congratulations You won\n Press Enter to play again\nPress T to Return to main menu");
+					gmOver.setScale(3, 3);
+					window.draw(gmOver);
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+					{
+						lev = lev1;
+						p1.reset();
+						p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
+						view1.setCenter(p1.x, 540);
+						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+
+						p1.alive = true;
+						level2.placePlats(2);
+						level1.placePlats(1);
+						level3.placePlats(3);
+					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+					{
+						_pClient->lvl = 0;
+						lev = startScreen;
+					}
+
+				}
+
+				
+				else
+				{
+
+				}
+
+
+				//Scuffed Client calling stuff using bools
+				if (_pClient != nullptr)
+				{
+					if (_pClient->initFlag)
+					{
+						std::string msg = _pClient->initMsg;
+						std::string temp = "";
+						int num = (int)msg[1];
+						msg = &msg[3];
+						for (int i = 0; msg[i] != '\0'; i++)
+						{
+							if (msg[i] == '#')
+							{
+								if (temp != _pClient->name)
+								{
+									additional = new player(100.0f, 200.0f);
+									std::pair<std::string, player*> t(temp, additional);
+									additional->setTexture("Assets/Warrior.png");
+									coOpAray.insert(t);
+								}
+								temp = "";
+							}
+
+							else
+							{
+								temp += msg[i];
+							}
+						}
+						_pClient->initFlag = false;
+						if (temp != _pClient->name)
+						{
+							additional = new player(100.0f, 200.0f);
+							std::pair<std::string, player*> t(temp, additional);
+							additional->setTexture("Assets/Warrior.png");
+							coOpAray.insert(t);
+						}
+					}
+
+					
 
 			
-		}
+				}
 
+				
+
+				
+
+				window.display();
+
+
+
+			}
+		}
 		_ClientReceiveThread.join();
 		_ServerReceiveThread.join();
 

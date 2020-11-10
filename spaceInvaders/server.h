@@ -48,9 +48,9 @@ public:
 	~CServer();
 	bool hajime = false;
 
-	bool _2Done = false;
-	bool _3Done = false;
-	bool _4Done = false;
+	bool Done = false;
+
+	int num = 2;
 
 	// Virtual Methods from the Network Entity Interface.
 	virtual bool Initialise(); //Implicit in the intialization is the creation and binding of the socket

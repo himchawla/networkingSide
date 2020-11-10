@@ -41,12 +41,26 @@ public:
 
 	bool flag = false;
 
+	std::string name;
+
+	bool lvlFlag = false;
+
+	std::string lvlMsg;
+
 	std::string msg;
 
 	bool initFlag = false;
 
 	std::string initMsg;
 
+	bool lvlDatFlag = false;
+
+	std::string lvlDatMsg;
+
+	int lvl;
+
+	void sendLvl(int l);
+	
 
 	bool hajime = false;
 

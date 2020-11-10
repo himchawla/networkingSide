@@ -54,6 +54,17 @@ CClient::~CClient()
 	m_pWorkQueue = 0;
 }
 
+void CClient::sendLvl(int l)
+{
+	TPacket _packet;
+
+	std::string ss = std::to_string(l);
+	ss += "000";
+	_packet.Serialize(LEVEL, &ss[0]);
+
+	SendData(_packet.PacketData);
+}
+
 /***********************
 * Initialise: Initialises a client object by creating a client socket and filling out the socket address structure with details of server to send the data to.
 * @author:
@@ -188,6 +199,8 @@ bool CClient::Initialise()
 	do {
 		std::cout << "Please enter a username : ";
 		gets_s(_cUserName);
+		name = " ";
+		name.append(_cUserName);
 	} while (_cUserName[0] == 0);
 
 	TPacket _packet;
@@ -369,9 +382,26 @@ void CClient::ProcessData(char* _pcDataReceived)
 	case DATA:
 	{
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
-		std::cout << "SERVER> " << _packetRecvd.MessageContent << std::endl;
+		flag = true;
+		msg = _packetRecvd.MessageContent;
 		break;
 	}
+
+	case LEVEL:
+	{
+		int temp;
+		temp = std::stoi(_packetRecvd.MessageContent);
+		temp /= 1000;
+		lvl = (lvl > temp) ? lvl : temp;
+		lvlFlag = true;
+		std::cout << lvl << std::endl;
+	}break;
+
+	case LEVELDAT:
+	{
+		lvlDatFlag = true;
+		lvlDatMsg = _packetRecvd.MessageContent;
+	}break;
 
 	case BROADCAST:
 	{

@@ -60,6 +60,10 @@ bool CServer::Initialise()
 	//Get the port number to bind the socket to
 	unsigned short _usServerPort = QueryPortNumber(DEFAULT_SERVER_PORT);
 
+	std::cout << "Enter the number of Players :";
+	std::cin >> num;
+	std::cout << std::endl;
+
 	//Initialise the socket to the local loop back address and port number
 	if (!m_pServerSocket->Initialise(_usServerPort))
 	{
@@ -76,7 +80,7 @@ bool CServer::AddClient(std::string _strClientName)
 {
 	//TO DO : Add the code to add a client to the map here...
 
-	if (!_4Done)
+	if (!Done)
 	{
 		for (auto it = m_pConnectedClients->begin(); it != m_pConnectedClients->end(); ++it)
 		{
@@ -99,21 +103,9 @@ bool CServer::AddClient(std::string _strClientName)
 		std::string _strAddress = ToString(m_ClientAddress);
 		m_pConnectedClients->insert(std::pair < std::string, TClientDetails >(_strAddress, _clientToAdd));
 	}
-	if (m_pConnectedClients->size() == 2)
+	if (m_pConnectedClients->size() == num)
 	{
-		_2Done = true;
-		sendInit();
-	}
-
-	if (m_pConnectedClients->size() == 3)
-	{
-		_3Done = true;
-		sendInit();
-	}
-
-	if (m_pConnectedClients->size() == 4)
-	{
-		_4Done = true;
+		Done = true;
 		sendInit();
 	}
 
@@ -219,12 +211,12 @@ void CServer::sendInit()
 {
 	std::string msg = "";
 
-	msg += m_pConnectedClients->size();
+	msg += (int)m_pConnectedClients->size();
 
 	for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
 	{
 		msg += "#";
-		msg += i->first;
+		msg += i->second.m_strName;
 	
 	}
 
@@ -238,6 +230,7 @@ void CServer::sendInit()
 
 	for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
 	{
+		
 		SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
 	}
 }
@@ -267,26 +260,78 @@ void CServer::ProcessData(std::pair<sockaddr_in, std::string> dataItem)
 				SendDataTo(_packetToSend.PacketData, dataItem.first);
 			}
 		}
-		break;
-	}
-	case DATA:
+	}		break;
+
+	case LEVEL:
 	{
-		_packetToSend.Serialize(DATA, _packetRecvd.MessageContent);
-		
+
+		_packetToSend.Serialize(LEVEL, _packetRecvd.MessageContent);
+
 
 		//std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
+		for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
+		{
+			//if (i->second.m_ClientAddress.sin_port != m_ClientAddress.sin_port)
+			{
+				SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
+			}
+		}
+	}break;
+
+	case LEVELDAT:
+	{
+
+		std::string read = _packetRecvd.MessageContent;
+		int i = 1;
+		std::string temp = "";
+		//std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		while (read[i] != '#')
+		{
+			temp += read[i];
+			i++;
+		}
+
+		_packetToSend.Serialize(LEVELDAT, &read[i+1]);
+
+
+
+		for (auto i = m_pConnectedClients->begin(); i != m_pConnectedClients->end(); i++)
+		{
+			if (i->second.m_strName != temp)
+			{
+				SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
+			}
+		}
+		//	SendData(_packetToSend.PacketData);
+
+	}		break;
+	case DATA:
+	{
+
+		_packetToSend.Serialize(DATA, _packetRecvd.MessageContent);
+		
+		std::string read = _packetRecvd.MessageContent;
+		int i = 1;
+		std::string temp = "";
+		//std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		while (read[i] != '#')
+		{
+			temp += read[i];
+			i++;
+		}
+
 		for (auto i = m_pConnectedClients->begin(); i!=m_pConnectedClients->end();i++)
 		{
-			if (i->second.m_ClientAddress.sin_port != m_ClientAddress.sin_port)
+			if (i->second.m_strName != temp)
 			{
 				SendDataTo(_packetToSend.PacketData, i->second.m_ClientAddress);
 			}
 		}
 	//	SendData(_packetToSend.PacketData);
 
-		break;
-	}
+	}		break;
+
 
 	case BROADCAST:
 	{
@@ -296,8 +341,8 @@ void CServer::ProcessData(std::pair<sockaddr_in, std::string> dataItem)
 		
 		_packetToSend.Serialize(BROADCAST, &msg[0]);
 		SendData(_packetToSend.PacketData);
-		break;
-	}
+	}		break;
+
 
 	default:
 		break;

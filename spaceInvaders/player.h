@@ -41,6 +41,7 @@ public:
 	void setLives(int l);
 	int getScore();
 	void addScore();
+	void setScore(int s);
 	bool isJump();
 	Bullet* getBull();
 	bool grounded;
@@ -57,9 +58,12 @@ public:
 	char key;
 	char verkey;
 	char attkey;
+	void Key();
 	void setSpawnPos(float x, float y);
 	void Keyboard();
 	void update(float time);
+
+	void ups(float time);
 	
 	void recieveDamage(float dam);
 	void applyDamage(baseEnemy* en);
