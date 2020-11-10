@@ -1,59 +1,11 @@
-﻿  baseEnemy.cpp
-  Bullet.cpp
-  client.cpp
-  collision.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(106,42): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(106,42): warning C4244:         with
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(106,42): warning C4244:         [
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(106,42): warning C4244:             T=int
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(106,42): warning C4244:         ]
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,55): warning C4244:         with
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,55): warning C4244:         [
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,55): warning C4244:             T=int
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,55): warning C4244:         ]
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,42): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,42): warning C4244:         with
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,42): warning C4244:         [
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,42): warning C4244:             T=int
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(107,42): warning C4244:         ]
-  consoletools.cpp
-  inputlinebuffer.cpp
-  level.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(108,47): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(108,47): warning C4244:         with
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(108,47): warning C4244:         [
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(108,47): warning C4244:             T=int
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\collision.cpp(108,47): warning C4244:         ]
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\level.cpp(38,25): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\level.cpp(39,21): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-  network.cpp
-  physics.cpp
-  platform.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\level.cpp(51,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\platform.cpp(43,18): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\platform.cpp(47,18): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\platform.cpp(52,18): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-  player.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\platform.cpp(57,18): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
-  server.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\player.cpp(36,10): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-  socket.cpp
-  Source.cpp
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\server.cpp(214,41): warning C4267: 'argument': conversion from 'size_t' to '_Elem', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\server.cpp(214,41): warning C4267:         with
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\server.cpp(214,41): warning C4267:         [
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\server.cpp(214,41): warning C4267:             _Elem=char
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\server.cpp(214,41): warning C4267:         ]
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(245,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+﻿  Source.cpp
 D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(246,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(263,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(265,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(330,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(340,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(1490,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(1514,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  sprite.cpp
-  Generating Code...
-D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(562,6): warning C4102: 'skip': unreferenced label
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(247,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(264,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(266,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(331,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(341,16): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(1541,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(1579,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\spaceInvaders\Source.cpp(570,6): warning C4102: 'skip': unreferenced label
   spaceInvaders.vcxproj -> D:\Users\Himanshu.Cha8420\Documents\GitHub\networkingSide\Debug\spaceInvaders.exe

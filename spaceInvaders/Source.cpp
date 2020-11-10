@@ -34,6 +34,7 @@ bool pSpeedChange = 0, eSpeedChange = 0, god = 0, gravChange, toTransform;
 float plaSpeed = 0.0f, enSpeed = 0.0f, gravVal = 0.0f;
 float pX = 0, pY = 0;
 bool wannaSend = true;
+bool showScore = false;
 
 std::map<std::string, player*> coOpAray;
 player* additional;
@@ -502,6 +503,13 @@ int main()
 		sf::Text dataLives;
 		sf::Text dataScore;
 
+		sf::Text tex[4];
+		for (int i = 0; i < 4; i++)
+		{
+			tex[i].setFont(font);
+			tex[i].setString("");
+		}
+
 		dataLives.setFont(font);
 		dataScore.setFont(font);
 
@@ -590,6 +598,7 @@ int main()
 			while (window.isOpen() && _pClient->hajime)
 			{
 
+
 				if (_pClient != nullptr)
 				{
 					//If the message queue is empty 
@@ -645,6 +654,11 @@ int main()
 					{
 						p1.verkey = 'V';
 					}
+
+					if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::I))
+					{
+						showScore = true;
+					}
 				}
 				//Debug Transform
 				if (toTransform)
@@ -658,14 +672,32 @@ int main()
 					toTransform = false;
 				}
 
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+				if (showScore)
 				{
+					system("CLS");
+
+					int j = 0;
+
 					for (auto i : coOpAray)
 					{
-						std::cout << i.second->getScore() << "\t" << i.second->getLives() << std::endl;
-					}
-					std::cout << p1.getScore() << "\t" << p1.getLives() << std::endl;
+						std::string s =  i.first + "\t" +  std::to_string(i.second->getScore()) + "\t" + std::to_string(i.second->getLives());
 
+						std::cout << s << std::endl;
+						//_getch();
+						
+						tex[j].setString(s);
+						tex[j].setScale(4, 4);
+
+						tex[j++].setPosition(view1.getCenter().x + 100, view1.getCenter().y - 50 * j);
+					}
+
+					for (int i = 0; i < 4; i++)
+					{
+						window.draw(tex[i]);
+					}
+					//std::cout << p1.getScore() << "\t" << p1.getLives() << std::endl;
+					showScore = false;
+				
 				}
 
 				//StartScreen
@@ -774,6 +806,11 @@ int main()
 					p1.setScore(0);
 					p1.setLives(4);
 					p1.alive = true;
+					_pClient->lvlFlag = false;
+				}
+				else if (_pClient->lvlFlag)
+				{
+					_pClient->lvlFlag = false;
 				}
 
 				switch (_pClient->lvl)
@@ -927,7 +964,8 @@ int main()
 
 					for (auto i : coOpAray)
 					{
-						if (i.first != pInfo.uName)
+						std::string t = &pInfo.uName[2];
+						if (i.first == t)
 						{
 							stuffSet(i.second, pInfo);
 							if ((pInfo.shoot))
@@ -971,6 +1009,7 @@ int main()
 					lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
 
 				}
+
 
 				//Level 1 Hajime
 				if (lev == lev1)
@@ -1346,7 +1385,7 @@ int main()
 						level3.trigger.setTexture("Assets/leverLeft.png");
 						level3.plats[1].move(-2, deltaTime);
 						level3.trigger.move(-2, deltaTime);
-						p1.x -= 0.2f * deltaTime;
+						p1.dx = -0.2f;
 						p1.setLocation(p1.x, p1.y);
 						view1.setCenter(view1.getCenter().x - 0.2f * deltaTime, view1.getCenter().y);
 						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
@@ -1371,7 +1410,7 @@ int main()
 						level3.trigger.setTexture("Assets/leverRight.png");
 						level3.plats[1].move(2, deltaTime);
 						level3.trigger.move(2, deltaTime);
-						p1.x += 0.2f * deltaTime;
+						p1.dx += 0.2f;
 						p1.setLocation(p1.x, p1.y);
 						view1.setCenter(view1.getCenter().x + 0.2f * deltaTime, view1.getCenter().y);
 						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
@@ -1442,7 +1481,7 @@ int main()
 					{
 						level3.plats[1].setLocation(std::stof(_pClient->lvlDatMsg),level3.plats[1].sp.getPosition().y);
 
-						level3.trigger.setLocation(std::stof(_pClient->lvlDatMsg) + 200, level3.plats[1].sp.getPosition().y - 20);
+						level3.trigger.setLocation(std::stof(_pClient->lvlDatMsg) + 350, level3.plats[1].sp.getPosition().y - 100);
 					}break;
 					default:
 						break;
@@ -1502,6 +1541,20 @@ int main()
 						view1.setCenter(view1.getCenter().x - 0.3 * deltaTime, view1.getCenter().y);
 					}
 
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+					{
+						lev = lev1;
+						p1.reset();
+						p1.setLocation(level1.spawnPoints.x, level1.spawnPoints.y);
+						view1.setCenter(p1.x, 540);
+						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
+						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
+						p1.alive = true;
+						level2.placePlats(2);
+						level1.placePlats(1);
+						level3.placePlats(3);
+					}
+
 					bool flag = false;
 					for (auto i : coOpAray)
 					{
@@ -1551,6 +1604,10 @@ int main()
 						lives.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 500);
 						score.setPosition(view1.getCenter().x + 900, view1.getCenter().y - 400);
 
+
+
+						_pClient->sendLvl(1);
+						_pClient->lvl = 1;
 						p1.alive = true;
 						level2.placePlats(2);
 						level1.placePlats(1);
